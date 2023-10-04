@@ -1,63 +1,69 @@
-###############################################################################
-# Set default behavior to automatically normalize line endings.
-###############################################################################
-* text=auto
+#include <iostream>
+#include <string>
+#include <cmath>
 
-###############################################################################
-# Set default behavior for command prompt diff.
-#
-# This is need for earlier builds of msysgit that does not have it on by
-# default for csharp files.
-# Note: This is only used by command line
-###############################################################################
-#*.cs     diff=csharp
+using namespace std;
 
-###############################################################################
-# Set the merge driver for project and solution files
-#
-# Merging from the command prompt will add diff markers to the files if there
-# are conflicts (Merging from VS is not affected by the settings below, in VS
-# the diff markers are never inserted). Diff markers may cause the following 
-# file extensions to fail to load in VS. An alternative would be to treat
-# these files as binary and thus will always conflict and require user
-# intervention with every merge. To do so, just uncomment the entries below
-###############################################################################
-#*.sln       merge=binary
-#*.csproj    merge=binary
-#*.vbproj    merge=binary
-#*.vcxproj   merge=binary
-#*.vcproj    merge=binary
-#*.dbproj    merge=binary
-#*.fsproj    merge=binary
-#*.lsproj    merge=binary
-#*.wixproj   merge=binary
-#*.modelproj merge=binary
-#*.sqlproj   merge=binary
-#*.wwaproj   merge=binary
+bool проверка_цвета(int k, int l, int m, int n) {
+    return ((k + l) % 2 == (m + n) % 2);
+}
 
-###############################################################################
-# behavior for image files
-#
-# image files are treated as binary by default.
-###############################################################################
-#*.jpg   binary
-#*.png   binary
-#*.gif   binary
+bool проверка_угрозы(int k, int l, int m, int n, char piece) {
+    int dx = abs(k - m);
+    int dy = abs(l - n);
 
-###############################################################################
-# diff behavior for common document formats
-# 
-# Convert binary document formats to text before diffing them. This feature
-# is only available from the command line. Turn it on by uncommenting the 
-# entries below.
-###############################################################################
-#*.doc   diff=astextplain
-#*.DOC   diff=astextplain
-#*.docx  diff=astextplain
-#*.DOCX  diff=astextplain
-#*.dot   diff=astextplain
-#*.DOT   diff=astextplain
-#*.pdf   diff=astextplain
-#*.PDF   diff=astextplain
-#*.rtf   diff=astextplain
-#*.RTF   diff=astextplain
+    if (piece == 'Q') { 
+        return (k == m || l == n || dx == dy);
+    }
+    else if (piece == 'R') { 
+        return (k == m || l == n);
+    }
+    else if (piece == 'B') { 
+        return dx == dy;
+    }
+    else if (piece == 'N') { 
+        return (dx == 2 && dy == 1) || (dx == 1 && dy == 2);
+    }
+    return false; 
+}
+
+int main() {
+    int k, l, m, n;
+    char piece;
+    setlocale(LC_ALL, "Russian");
+    cout << "Введите координаты первого поля (k, l): ";
+    cin >> k >> l;
+    cout << "Введите координаты второго поля (m, n): ";
+    cin >> m >> n;
+
+    cout << "Являются ли поля (k, l) и поля (m, n) одного цвета: "
+        << (проверка_цвета(k, l, m, n) ? "Да" : "Нет") << endl;
+
+    cout << "Введите тип фигуры (Q - ферзь, R - Ладья, B - слон, N - конь) на поле (k, l): ";
+    cin >> piece;
+
+    cout << "Угрожает ли фигура на поле (k, l) полю (m, n)?: "
+        << (проверка_угрозы(k, l, m, n, piece) ? "Да" : "Нет") << endl;
+
+    cout << "Введите фигуру, которая могла бы попасть в поле (m, n) из поля (k, l): ";
+    cin >> piece;
+
+    if (проверка_угрозы(k, l, m, n, piece)) {
+        cout << "Фигура может достичь поля (m, n) с поля (k, l) за один ход.\n";
+    }
+    else {
+
+        for (int r = 0; r < 8; ++r) {
+            for (int c = 0; c < 8; ++c) {
+                if (проверка_угрозы(k, l, r + 1, c + 1, piece) && проверка_угрозы(r + 1, c + 1, m, n, piece)) {
+                    cout << "Фигура может достичь поля (m, n) с поля (k, l) за два хода по полю ("
+                        << r + 1 << ", " << c + 1 << ").\n";
+                    return 0;
+                }
+            }
+        }
+        cout << "Фигура не может достичь поля (m, n) с поля (k, l) за два хода.\n";
+    }
+    return 0;
+}
+
